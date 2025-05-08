@@ -1,8 +1,10 @@
+import os
 import requests
 import urllib.parse
 import re
 import string
 from tqdm import tqdm
+from dotenv import load_dotenv
 
 # https://github.com/n0kovo/n0kovo_subdomains
 with open("./n0kovo_subdomains_tiny.txt", "r") as f:
@@ -33,7 +35,7 @@ class Detector:
 
         url = self.domain
         if url is None:
-            url = input("Insira um dominio para analisar: ")
+            url = input("Insira uma url para analisar: ")
 
         if re.search(regex, url):
             print(f"Indício de phishing ==> {url} possui caracteres especiais")
@@ -44,7 +46,7 @@ class Detector:
 
         url = self.domain
         if url is None:
-            url = input("Insira um dominio para analisar: ")
+            url = input("Insira uma url para analisar: ")
 
         if re.search(regex_numbers, url):
             print(f"Indício de phishing ==> {url} possui números. Verificando se existe uma url sem numeros:")
@@ -82,12 +84,42 @@ class Detector:
         if urls_encontradas == 0:
             print("Nenhuma url encontrada")
 
+    def google_safe_browsing(self):
+        key = os.getenv("GOOGLE_API_KEY")
+        if key is None:
+            print("Coloque uma chave da API google para testar esse serviço")
+            return
+        
+        url = self.domain
+        if url is None:
+            url = input("Insira uma url para analisar: ")
+        
+        api_url = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={key}"
+        request_body = {
+            "client": {
+                "clientId": "projetodetectorphishing",
+                "clientVersion": "1.4"
+            },
+            "threatInfo": {
+                "threatTypes": ["SOCIAL_ENGINEERING", "POTENTIALLY_HARMFUL_APPLICATION"],
+                "platformTypes": ["CHROME", "WINDOWS"],
+                "threatEntryTypes": ["URL"],
+                "threatEntries": [
+                    {"url": url}
+                ]
+            }
+        }
+
+        response = requests.post(api_url, json=request_body)
+        print(response.text)
+    
     def run(self):
         print("\n0. Sair")
         print("1. Escolher url")
         print("2. Procurar caracteres especiais")
-        print("3. Procurar numeros")
+        print("3. Procurar números")
         print("4. Subdominios")
+        print("5. Google Safe Browsing")
         escolha = input(">>> ")
 
         if escolha == "0":
@@ -105,7 +137,11 @@ class Detector:
         elif escolha == "4":
             self.subdomain_scanner()
 
+        elif escolha == "5":
+            self.google_safe_browsing()
+
 def main():
+    load_dotenv()
     detector = Detector()
     while detector.running:
         detector.run()
