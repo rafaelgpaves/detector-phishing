@@ -5,6 +5,8 @@ import re
 import string
 from tqdm import tqdm
 from dotenv import load_dotenv
+import whois
+from datetime import datetime
 
 # https://github.com/n0kovo/n0kovo_subdomains
 with open("./n0kovo_subdomains_tiny.txt", "r") as f:
@@ -113,6 +115,18 @@ class Detector:
         response = requests.post(api_url, json=request_body)
         print(response.text)
     
+    def idade_dominio(self):
+        domain = self.domain
+        if domain is None:
+            domain = input("Insira uma url para analisar: ")
+
+        w = whois.whois(domain)
+        try:
+            data = datetime.date(w["creation_date"][0])
+        except:
+            data = datetime.date(w["creation_date"])
+        print(data)
+    
     def run(self):
         print("\n0. Sair")
         print("1. Escolher url")
@@ -120,6 +134,7 @@ class Detector:
         print("3. Procurar números")
         print("4. Subdominios")
         print("5. Google Safe Browsing")
+        print("6. Idade do domínio (whois)")
         escolha = input(">>> ")
 
         if escolha == "0":
@@ -139,6 +154,9 @@ class Detector:
 
         elif escolha == "5":
             self.google_safe_browsing()
+
+        elif escolha == "6":
+            self.idade_dominio()
 
 def main():
     load_dotenv()
