@@ -7,6 +7,7 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 import whois
 from datetime import datetime
+import json
 
 # https://github.com/n0kovo/n0kovo_subdomains
 with open("./n0kovo_subdomains_tiny.txt", "r") as f:
@@ -127,6 +128,21 @@ class Detector:
             data = datetime.date(w["creation_date"])
         print(data)
     
+    # outra possibilidade: modulo python (https://github.com/narbehaj/ssl-checker)
+    def ssl_certificates(self):
+        domain = self.domain
+        if domain is None:
+            domain = input("Insira uma url para analisar: ")
+
+        api_url = f"https://ssl-checker.io/api/v1/check/{domain}"
+        response = requests.get(api_url)
+        response = json.loads(response.text)
+
+        if response["status"] == "ok":
+            print(f"Emissor: {response['result']['issuer_o']}")
+            print(f"Data de expiração: {response['result']['valid_till']} (faltam {response['result']['valid_days_to_expire']} dias para expirar)")
+            print(f"Emitido para: {response['result']['issued_to']}")
+
     def run(self):
         print("\n0. Sair")
         print("1. Escolher url")
@@ -135,6 +151,7 @@ class Detector:
         print("4. Subdominios")
         print("5. Google Safe Browsing")
         print("6. Idade do domínio (whois)")
+        print("7. Analisar certificados SSL")
         escolha = input(">>> ")
 
         if escolha == "0":
@@ -157,6 +174,9 @@ class Detector:
 
         elif escolha == "6":
             self.idade_dominio()
+
+        elif escolha == "7":
+            self.ssl_certificates()
 
 def main():
     load_dotenv()
