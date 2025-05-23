@@ -143,6 +143,33 @@ class Detector:
             print(f"Data de expiração: {response['result']['valid_till']} (faltam {response['result']['valid_days_to_expire']} dias para expirar)")
             print(f"Emitido para: {response['result']['issued_to']}")
 
+    # primeiro checar se todos os redirecionamentos tem mesmo dono
+    def check_redirections(self):
+        key = os.getenv("GOOGLE_API_KEY")
+        if key is None:
+            print("Coloque uma chave da API google para testar esse serviço")
+            return
+        
+        domain = self.domain
+        if domain is None:
+            domain = input("Insira uma url para analisar: ")
+        
+        response = requests.get(domain, allow_redirects=True)
+        urls = []
+        organizations = []
+        num_redirecionamentos_suspeitos = 0
+        for resp in response.history:
+            print(f"Redirecionando para {resp.url}...")
+            urls.append(resp.url)
+            w = whois.whois(resp.url)
+            organizations.append(w["org"])
+            if w["org"] != organizations[0]:
+                print(f"{domain} da organização {organizations[0]} tem redirecionamento suspeito para {resp.url} da organização {w['org']}")
+                num_redirecionamentos_suspeitos += 1
+
+        if num_redirecionamentos_suspeitos == 0:
+            print("Nenhum redirecionamento suspeito encontrado")
+
     def run(self):
         print("\n0. Sair")
         print("1. Escolher url")
@@ -152,6 +179,7 @@ class Detector:
         print("5. Google Safe Browsing")
         print("6. Idade do domínio (whois)")
         print("7. Analisar certificados SSL")
+        print("8. Analisar redirecionamentos")
         escolha = input(">>> ")
 
         if escolha == "0":
@@ -177,6 +205,9 @@ class Detector:
 
         elif escolha == "7":
             self.ssl_certificates()
+
+        elif escolha == "8":
+            self.check_redirections()
 
 def main():
     load_dotenv()
