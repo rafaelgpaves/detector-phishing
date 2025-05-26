@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import whois
 from datetime import datetime
 import json
+import dns.resolver
 
 # https://github.com/n0kovo/n0kovo_subdomains
 with open("./n0kovo_subdomains_tiny.txt", "r") as f:
@@ -173,6 +174,28 @@ class Detector:
         if num_redirecionamentos_suspeitos == 0:
             print("Nenhum redirecionamento suspeito encontrado")
 
+    def dyndns(self):
+        # futuro: https://github.com/alexandrosmagos/dyn-dns-list
+        providers = [
+            "no-ip.com", "dyndns.org", "duckdns.org", "dyn.com", "changeip.com",
+            "afraid.org", "dnsdynamic.org", "dynu.com", "hopto.org", "zapto.org"
+        ]
+        domain = self.domain
+        if domain is None:
+            domain = input("Insira um dominio para analisar: ")
+
+        try:
+            answers = dns.resolver.resolve(domain, 'NS')
+            ns_records = [ans.to_text() for ans in answers]
+            # print(f"Nameservers encontrados: {ns_records}")
+            for ns in ns_records:
+                if any(provider in ns for provider in providers):
+                    print(f"Indício de phishing ==> {domain} usa DNS dinâmico ({ns})")
+                    return
+            print(f"{domain} não parece usar DNS dinâmico.")
+        except Exception as e:
+            print(f"Erro ao consultar DNS: {e}")
+
     def run(self):
         print("\n0. Sair")
         print("1. Escolher url")
@@ -183,6 +206,7 @@ class Detector:
         print("6. Idade do domínio (whois)")
         print("7. Analisar certificados SSL")
         print("8. Analisar redirecionamentos")
+        print("9. Verificar uso de DNS dinâmico")
         escolha = input(">>> ")
 
         if escolha == "0":
@@ -211,6 +235,9 @@ class Detector:
 
         elif escolha == "8":
             self.check_redirections()
+
+        elif escolha == "9":
+            self.dyndns()
 
 def main():
     load_dotenv()
