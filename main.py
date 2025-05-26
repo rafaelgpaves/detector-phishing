@@ -79,13 +79,16 @@ class Detector:
             url = f"https://{SUBDOMAINS[i]}.{domain}"
             try:
                 requests.get(url)
-                print(f"url encontrada ==> {url}")
+                # print(f"url encontrada ==> {url}")
                 urls_encontradas += 1
             except:
                 pass
 
         if urls_encontradas == 0:
             print("Nenhuma url encontrada")
+        else:
+            proporcao = urls_encontradas/escolha
+            print(f"Foram encontrados {urls_encontradas} domínios (${100*proporcao:.2f}%)")
 
     def google_safe_browsing(self):
         key = os.getenv("GOOGLE_API_KEY")
@@ -213,7 +216,11 @@ def main():
     load_dotenv()
     detector = Detector()
     while detector.running:
-        detector.run()
+        try:
+            detector.run()
+        except Exception as e:
+            print(f"Ocorreu uma exceção: {e}")
+            print("Verifique o input esperado e tente novamente")
 
 if __name__ == "__main__":
     main()
