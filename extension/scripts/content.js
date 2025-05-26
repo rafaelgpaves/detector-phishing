@@ -31,5 +31,5 @@ document.addEventListener("mouseover", function (event) {
 });
 
 function isPhishingURL(url) {
-  return url.includes("youtube.com");
+  return url.includes("stackoverflow.com");
 }
