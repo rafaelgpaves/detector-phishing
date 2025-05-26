@@ -21,12 +21,11 @@ document.addEventListener("mouseover", function (event) {
 
     // Verificar se o link é suspeito
     if (isPhishingURL(url)) {
-      alert(`Cuidado! O link ${url} pode ser um phishing.`);
+        chrome.runtime.sendMessage({ action: "openPopup" , url: url});
     }
   }
 });
 
 function isPhishingURL(url) {
-  // Implementar lógica de detecção de phishing
   return url.includes("youtube.com");
 }
