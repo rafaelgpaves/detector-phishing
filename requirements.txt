@@ -1,6 +1,7 @@
 certifi==2025.4.26
 charset-normalizer==3.4.2
 colorama==0.4.6
+dnspython==2.7.0
 idna==3.10
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
