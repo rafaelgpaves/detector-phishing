@@ -14,16 +14,20 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener("mouseover", function (event) {
-  const target = event.target;
+    const target = event.target;
 
-  if (target.tagName === "A" && target.href) {
-    const url = target.href;
+    if (target.tagName === "A" && target.href) {
+        const url = target.href;
 
-    // Verificar se o link é suspeito
-    if (isPhishingURL(url)) {
-        chrome.runtime.sendMessage({ action: "openPopup" , url: url});
+        if (isPhishingURL(url)) {
+            chrome.storage.local.get(["whitelist"]).then((data) => {
+                const whitelist = data.whitelist;
+                if (!whitelist?.includes(url)) {
+                    chrome.runtime.sendMessage({ action: "openPopup" , url: url});
+                }
+            })
+        }
     }
-  }
 });
 
 function isPhishingURL(url) {
