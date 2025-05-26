@@ -22,26 +22,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     }
                 }
 
-                var new_rules = []
-                urls.forEach((url, idx) => {
-                    let id = idx + 1;
-                    new_rules.push({
-                        "id": id,
-                        "priority": 1,
-                        "action": { "type": "block" },
-                        "condition": {
-                            "urlFilter": `|${url}`,
-                            "resourceTypes": ["main_frame"]
-                        }
-                    })
-                });
-                chrome.declarativeNetRequest.getDynamicRules(previousRules => {
-                    const previousRuleIds = previousRules.map(rule => rule.id);
-                    chrome.declarativeNetRequest.updateDynamicRules({
-                        removeRuleIds: previousRuleIds,
-                        addRules: new_rules
-                    });
-                });
+                chrome.storage.local.get(["bloquear"]).then((resposta) => {
+                    if (resposta.bloquear) {
+                        var new_rules = []
+                            urls.forEach((url, idx) => {
+                            let id = idx + 1;
+                            new_rules.push({
+                                "id": id,
+                                "priority": 1,
+                                "action": { "type": "block" },
+                                "condition": {
+                                    "urlFilter": `|${url}`,
+                                    "resourceTypes": ["main_frame"]
+                                }
+                            })
+                        });
+                        chrome.declarativeNetRequest.getDynamicRules(previousRules => {
+                            const previousRuleIds = previousRules.map(rule => rule.id);
+                            chrome.declarativeNetRequest.updateDynamicRules({
+                                removeRuleIds: previousRuleIds,
+                                addRules: new_rules
+                            });
+                        });
+                    } else {
+                        chrome.declarativeNetRequest.getDynamicRules(previousRules => {
+                            const previousRuleIds = previousRules.map(rule => rule.id);
+                            chrome.declarativeNetRequest.updateDynamicRules({
+                                removeRuleIds: previousRuleIds
+                            });
+                        });
+                    }                    
+                })
             });
         });
     }
