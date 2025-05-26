@@ -11,3 +11,30 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+function trustSite() {
+    chrome.storage.local.get(["urlAtual"]).then((result) => {
+        const url = result.urlAtual;
+        chrome.storage.local.get(["whitelist"]).then((data) => {
+            var whitelist = data.whitelist;
+            if (whitelist?.length > 0 && !whitelist?.includes(url)) {
+                chrome.storage.local.set({ "whitelist" : [...whitelist, url]});
+            } else if (whitelist.length == 0) {
+                chrome.storage.local.set({ "whitelist" : [url]});
+            }
+            console.log(whitelist);
+
+            chrome.storage.local.get(["urlsSuspeitas"]).then((response) => {
+                var new_urls = response.urlsSuspeitas;
+                const index = new_urls.indexOf(url);
+                if (index > -1) {
+                    new_urls.splice(index, 1);
+                }
+                console.log(new_urls);
+                chrome.storage.local.set({ "urlsSuspeitas" : [...new_urls]});
+            })
+        });
+        alert(`Você não será mais avisado sobre ${url}`);
+    });
+}
+document.getElementById("trust").addEventListener("click", trustSite)
