@@ -4,8 +4,15 @@
   "version": "1.0",
   "description": "Detects phishing websites and warns users about suspicious links.",
   "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "tabs",
     "activeTab",
+    "storage",
     "scripting"
+  ],
+  "host_permissions": [
+    "*://*/*"
   ],
   "background": {
     "service_worker": "scripts/background.js"
@@ -18,6 +25,7 @@
   ],
   "action": {
     "default_popup": "hello.html",
+    "default_title": "Cuidado!",
     "default_icon": "icon.png"
   }
 }

@@ -24,6 +24,7 @@ function trustSite() {
             }
             console.log(whitelist);
 
+            // Tirando url da lista de urls suspeitas
             chrome.storage.local.get(["urlsSuspeitas"]).then((response) => {
                 var new_urls = response.urlsSuspeitas;
                 const index = new_urls.indexOf(url);
@@ -32,6 +33,28 @@ function trustSite() {
                 }
                 console.log(new_urls);
                 chrome.storage.local.set({ "urlsSuspeitas" : [...new_urls]});
+
+                // Tirando regra para bloquear
+                var new_rules = []
+                new_urls.forEach((url, idx) => {
+                    let id = idx + 1;
+                    new_rules.push({
+                        "id": id,
+                        "priority": 1,
+                        "action": { "type": "block" },
+                        "condition": {
+                            "urlFilter": `|${url}`,
+                            "resourceTypes": ["main_frame"]
+                        }
+                    })
+                });
+                chrome.declarativeNetRequest.getDynamicRules(previousRules => {
+                    const previousRuleIds = previousRules.map(rule => rule.id);
+                    chrome.declarativeNetRequest.updateDynamicRules({
+                        removeRuleIds: previousRuleIds,
+                        addRules: new_rules
+                    });
+                });
             })
         });
         alert(`Você não será mais avisado sobre ${url}`);
