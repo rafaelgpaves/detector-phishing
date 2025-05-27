@@ -59,7 +59,7 @@ class Detector:
                 requests.get(url_sem_numeros)
                 print(f"Encontrada url {url} sem números: {url_sem_numeros}")
             except:
-                pass
+                print("URL com números trocados não foi encontrada")
 
     def subdomain_scanner(self):
         escolha = ""
@@ -118,7 +118,12 @@ class Detector:
         }
 
         response = requests.post(api_url, json=request_body)
-        print(response.text)
+        # print(response.text)
+        data = json.loads(response.text)
+        if bool(data):
+            print("URL PRESENTE NO GOOGLE SAFE BROWSING, ALTAS CHNACES DE PHISHING!")
+        else:
+            print("Não foram encontrados indícios no Google Safe Browsing")
     
     def idade_dominio(self):
         domain = self.domain
