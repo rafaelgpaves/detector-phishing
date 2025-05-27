@@ -72,6 +72,8 @@ Caso você acredite que um site foi bloqueado sem razão, coloque-o na whitelist
 
 A princípio, o plugin não impede a navegação para páginas suspeitas. Para ativar essa opção, clique no ícone da extensão e ative a opção de bloquear sites suspeitos.
 
+A lista de urls suspeitas e a whitelist persistem até mesmo quando a extensão é desativada. Um dos modos de apagá-las é desinstalando a extensão e importando-a novamente
+
 #### Para usar o Google Safe Browsing
 
 Usando a chave da API:
