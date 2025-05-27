@@ -1,5 +1,5 @@
-document.addEventListener("DOMContentLoaded", () => {
-    chrome.storage.local.get("urlsSuspeitas", (data) => {
+function setCurrentUrl() {
+    chrome.storage.local.get(["urlsSuspeitas"]).then((data) => {
         const txt = document.getElementById("site");
         console.log(data.urlsSuspeitas);
         chrome.storage.local.get(["urlAtual"]).then((result) => {
@@ -10,7 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-});
+}
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setCurrentUrl);
+} else {
+    setCurrentUrl();
+}
 
 function trustSite() {
     chrome.storage.local.get(["urlAtual"]).then((result) => {
