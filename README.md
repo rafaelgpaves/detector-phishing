@@ -87,3 +87,7 @@ Caso não queira fazer uma chave ou queira apenas testar, descomente a linha 42 
 - Bloqueio preventivo: Opção para bloquear automaticamente o acesso a páginas identificadas como phishing
 - Personalização: Permitir que o usuário defina o nível de sensibilidade das análises e crie listas de sites confiáveis (whitelist)
 - Análise de links: Verificação de links ao passar o mouse sobre eles antes mesmo de clicar
+
+### Em caso de problemas com a extensão
+
+Ás vezes, é possível que ocorram erros de contexto, que ocorrem pela extensão ter sido ativada/desativada durante algum processo ocorrendo em segundo plano. Nesses casos, clique no botão de recarregar (ao lado do botão de habilitar a extensão), recarregue a página e tente novamente
